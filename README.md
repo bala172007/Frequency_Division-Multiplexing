@@ -1,5 +1,4 @@
-# Frequency-Division-Multiplexing-
-
+<h1>Frequency Division Multiplexing</h1>
 
 <h2>Aim:</h2>
 To study and implement Frequency Division Multiplexing (FDM) and Demultiplexing using SCILAB by combining six different message signals into a single composite signal for transmission and then recovering each message signal at the receiver through demodulation and filtering.
@@ -33,97 +32,70 @@ Frequency Division Multiplexing (FDM) is a technique in which multiple message s
 
 <h2>Code:</h2>
 
-```asm
+```
+
 clc;
 clear;
 close;
 
-// ---------- settings ----------
-PI = 3.14;                // use 3.14 as requested
-fs = 80000;               // high sampling rate -> smooth plots
-t = 0:1/fs:0.01;          // time vector
+fs = 25000;              
+t = 0:1/fs:0.04;        
 
-fm = [200, 400, 600, 800, 1000, 1200];       // message freqs (Hz)
-fc = [5000, 7000, 9000, 11000, 13000, 15000]; // carrier freqs (Hz)
+fm = [80, 160, 240, 320, 400, 480]; 
+m = [];
 
-// ---------- generate message signals ----------
-m = zeros(length(fm), length(t));
-for i = 1:length(fm)
-    m(i, :) = sin(2 * PI * fm(i) * t);
+for i = 1:6
+    m(i, :) = sin(2*%pi*fm(i)*t);
 end
 
-// ---------- multiplex (AM with cosine carriers) ----------
+fc = [2500, 3500, 4500, 5500, 6500, 7500];
+
 fdm = zeros(1, length(t));
-for i = 1:length(fc)
-    carrier = cos(2 * PI * fc(i) * t);
-    fdm = fdm + m(i, :) .* carrier;
+for i = 1:6
+    c = cos(2*%pi*fc(i)*t);
+    s = m(i, :) .* c;
+    fdm = fdm + s;
 end
 
-// ---------- design FIR low-pass filter (sinc * Hamming) ----------
-fc_cut = 2000;           // cutoff 2 kHz (pass message band)
-M = 200;                 // half filter order -> filter length = 2*M+1 = 401
-n = -M:M;
-wc = 2 * fc_cut / fs;    // normalized (0..1) where 1 => Nyquist
-
-// ideal sinc (note: use PI for pi)
-sinc = zeros(n);
-for k = 1:length(n)
-    x = 2 * fc_cut * n(k) / fs;               // x = 2*fc_cut*n/fs
-    if x == 0 then
-        sinc(k) = 1;
-    else
-        // sinc(x) = sin(pi * x) / (pi * x)
-        sinc(k) = sin(PI * x) / (PI * x);
-    end
+scf(1);
+clf;
+for i = 1:6
+    subplot(6,1,i);
+    plot(t, m(i, :));
 end
 
-// ideal impulse response scaled by cutoff (2*fc_cut/fs)
-h_ideal = (2 * fc_cut / fs) * sinc;
+scf(2);
+clf;
+plot(t, fdm);
 
-// apply Hamming window
-w = 0.54 - 0.46 * cos(2 * PI * (n + M) / (2*M)); // Hamming length 2M+1
-h = h_ideal .* w;
-
-// normalize filter gain at DC
-h = h / sum(h);
-
-// ---------- demodulate (coherent detection + LPF) ----------
-demod = zeros(length(fm), length(t));
-for i = 1:length(fc)
-    x = fdm .* cos(2 * PI * fc(i) * t);     // mix to baseband
-    y = conv(x, h, 'same');                 // filter (same length)
+demod = [];
+for i = 1:6
+    c = cos(2*%pi*fc(i)*t);
+    x = fdm .* c;
+    h = ones(1,100)/100;
+    y = conv(x, h, 'same');
     demod(i, :) = y;
 end
 
-// ---------- plots ----------
-scf(1); clf;
-for i = 1:size(m,1)
-    subplot(size(m,1),1,i);
-    plot(t, m(i,:));
+scf(3);
+clf;
+for i = 1:6
+    subplot(6,1,i);
+    plot(t, demod(i, :));
 end
 
-scf(2); clf;
-plot(t, fdm);
+disp("FDM and Demultiplexing completed with NEW frequencies!");
 
-scf(3); clf;
-for i = 1:size(demod,1)
-    subplot(size(demod,1),1,i);
-    plot(t, demod(i,:));
-end
 
-disp("Done: smooth demodulated signals.");
 ```
+
 <h2>Output Waveform</h2>
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/43a93c95-7b69-4bab-9f1f-f973251d569e" />
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/19351d61-0881-424d-b2cf-01a9c974c6ef" />
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/bec91be7-80b3-4edb-b5ab-04e00e5b4ef6" />
 
-<img width="1918" height="1032" alt="image" src="https://github.com/user-attachments/assets/8fe79bd3-4e04-4330-b635-8a3c0a84f65d" />
 
-<img width="1917" height="1041" alt="image" src="https://github.com/user-attachments/assets/440142c8-5e20-4c77-9a93-f3b34b7b7433" />
-
-<img width="1917" height="1105" alt="image" src="https://github.com/user-attachments/assets/e9cbfa2c-8b47-4f9e-87a7-35f4fc8ec13a" />
-
-![WhatsApp Image 2025-11-21 at 12 39 25_2aa2aaa9](https://github.com/user-attachments/assets/41104cee-70da-44bd-847f-173a09effb75)
-
-![WhatsApp Image 2025-11-21 at 12 39 24_6683fa45](https://github.com/user-attachments/assets/5c6817c5-9273-407a-b237-aec544157d12)
+<h2>Tabulation:</h2>
 
 
 <h1>Result:</h1>
