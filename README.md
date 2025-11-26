@@ -96,6 +96,7 @@ disp("FDM and Demultiplexing completed with NEW frequencies!");
 
 
 <h2>Tabulation:</h2>
+![WhatsApp Image 2025-11-26 at 16 09 40_1ccaae28](https://github.com/user-attachments/assets/451f7b24-04e0-4b26-a5de-29ecc3d481df)
 
 
 <h1>Result:</h1>
